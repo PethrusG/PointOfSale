@@ -11,7 +11,13 @@ import integration.Taxes;
 import integration.Discount;
 import integration.RunningTotalPresentation;
 import integration.Customer;
+import integration.DiscountNormal;
+import integration.DiscountSpecial;
+import integration.Observable;
+import integration.Observer;
 import integration.RunningTotalLog;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -21,12 +27,13 @@ import integration.RunningTotalLog;
  * goods. Adds taxes, discount, calculates change and logs the sale in the 
  * external systems as well as prints the receipt.
  */
-public class CloseSale {
+public class CloseSale implements Observable{
 
 	private RunningTotal runningTotal;
 	private Taxes taxes;
 	private Discount discount;
 	private CompanyLog companyLog;
+	private List<Observer> observers;
 
 	/**
 	 * Creates CloseSale and gives it access to the current RunningTotal object
@@ -37,8 +44,9 @@ public class CloseSale {
 	public CloseSale(RunningTotal runningTotal) {
 		this.runningTotal = runningTotal;
 		this.taxes = new Taxes();
-		this.discount = new Discount();
+		this.discount = new DiscountNormal();
 		this.companyLog = new CompanyLog(runningTotal.getInventory());
+		this.observers = new ArrayList<>();
 	}	
 	/**
 	 * Adds taxes to the current RunningTotal object
@@ -61,6 +69,13 @@ public class CloseSale {
 		return new RunningTotalPresentation("Total With Discount", -1, 
 			runningTotal.getTotalSoFar());
 	}
+/**
+ * Sets a special discount that is not the normal one by means of using the
+ * Strategy pattern.
+ */
+	public void setDiscountSpecial() {
+		discount = new DiscountSpecial();
+	}
 	/** 
 	 * Calculates the change once the purchase is over. Also logs the sale in the
 	 * external systems.
@@ -78,6 +93,31 @@ public class CloseSale {
 			new RunningTotalLog(runningTotal.getListOfCurrentItems(), 
 				runningTotal.getTotalSoFar());
 		companyLog.logSale(runningTotalLog);
+		notifyObservers();
+	}
+/**
+ * Adds an observer 
+ * @param o Observer to be added
+ */
+	@Override
+	public void addObserver(Observer o) {
+		observers.add(o);
+	}
+/**
+ * Removes an observer
+ * @param o Observer to be removed
+ */
+	@Override
+	public void removeObserver(Observer o) {
+		observers.remove(o);
+	}
+/** 
+ * Used to notify observers once there is a state update.
+ */
+	@Override
+	public void notifyObservers() {
+		for(Observer o: observers)
+			o.updateTotalRevenue(runningTotal.getTotalSoFar());
 	}
 
 }

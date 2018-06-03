@@ -8,6 +8,10 @@ package controller;
 import model.RunningTotal;
 import integration.RunningTotalPresentation;
 import integration.Customer;
+import integration.DatabaseFailureException;
+import integration.NoSuchItemException;
+import integration.Observer;
+import integration.OperationFailedException;
 import model.CloseSale;
 /**
  *
@@ -28,7 +32,7 @@ public class Controller {
  */
     public Controller(RunningTotal runningTotal) {
 		this.runningTotal = runningTotal;
-		closeSale = new CloseSale(runningTotal);
+		this.closeSale = new CloseSale(runningTotal);
     }
 
 /**
@@ -39,10 +43,18 @@ public class Controller {
  * @return Returns a final RunningTotalPresentation object which the View
  * can use to display the result of this method call.
  */
-    public RunningTotalPresentation registerItem(int itemId, int amount) {
-		RunningTotalPresentation runningTotalPresentation = 
-	        runningTotal.registerItem(itemId, amount);
-	    return runningTotalPresentation;
+    public RunningTotalPresentation registerItem(int itemId, int amount) 
+    		throws NoSuchItemException, OperationFailedException {
+		
+	    try {
+		    RunningTotalPresentation runningTotalPresentation = 
+				runningTotal.registerItem(itemId, amount);
+		    return runningTotalPresentation;	
+	    }
+
+	    catch(DatabaseFailureException exc) {
+		    throw new OperationFailedException("Operation failed, please try again later.", exc);
+	    }
     }
 
     /**
@@ -78,5 +90,27 @@ public class Controller {
     public RunningTotalPresentation payPurchase(double payment) {
 	    return new RunningTotalPresentation("Your change is", -1, 
 		    closeSale.calculateChange(payment)); 
+    }
+
+	/**
+	 * Adds an Observer interface to the CloseSale class
+	 * @param o The Observer to be added
+	 */
+    public void addTotalRevenueObserver(Observer o) {
+	    closeSale.addObserver(o);
+    }
+	
+/** Sets another discount than the default one
+ * 
+ */
+	public void setDiscountSpecial() {
+		closeSale.setDiscountSpecial();
+	}
+	
+/**
+ * Used to start a new sale.
+ */
+    public void newSale() {
+			this.runningTotal.newSale();
     }
 }

@@ -5,22 +5,17 @@
  */
 package integration;
 
-import model.RunningTotal;
 /**
- *
+ * Defines what a class dealing with discounts should include
  * @author pethrus
- * 
- * Used to calculate discounts.
  */
-public class Discount {
+public interface Discount {
 	
 	/**
-	 * Adds discount based on the customer and items in runningTotal.
-	 * @param customer Identifies the customer
-	 * @param runningTotal Gives all the items in the customer's basket
-	 * @return An updated totalSoFar
+	 * Adds a discount to the totalSoFar
+	 * @param customer The customer of the current purchase
+	 * @param totalSoFar The total that the customer is going to pay so far
+	 * @return 
 	 */
-	public double addDiscount(Customer customer, double totalSoFar) {
-		return totalSoFar * 0.9;
-	}	
+	public double addDiscount(Customer customer, double totalSoFar); 
 }

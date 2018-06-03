@@ -5,9 +5,11 @@
  */
 package model;
 
+import integration.DatabaseFailureException;
 import integration.ListOfCurrentItems;
 import integration.Inventory;
 import integration.Item;
+import integration.NoSuchItemException;
 import integration.RunningTotalPresentation;
 
 /**
@@ -29,8 +31,7 @@ public class RunningTotal {
 		 * used as a DTO when needed.
 		 */
     public RunningTotal() {
-		Item[] itemList = createItemList();
-		this.inventory = new Inventory(itemList);
+		this.inventory = Inventory.getInventory();
 		this.listOfCurrentItems = new ListOfCurrentItems();
 		// this.currentItem = new Item();
 		this.totalSoFar = 0;
@@ -44,8 +45,10 @@ public class RunningTotal {
 	 * @param itemId Identifier of the item
 	 * @param amount Number of items of the same kind.
 	 * @return 
+	 * @throws integration.NoSuchItemException 
 	 */
-    public RunningTotalPresentation registerItem(int itemId, int amount) {
+    public RunningTotalPresentation registerItem(int itemId, int amount) 
+    		throws NoSuchItemException, DatabaseFailureException {
 	    Item retrievedItem = inventory.getItem(itemId);
 		if (retrievedItem != null) {
 			updateTotalSoFar(retrievedItem.getPrice(), amount);
@@ -54,7 +57,7 @@ public class RunningTotal {
 					retrievedItem.getPrice(), totalSoFar);		
 		}
 		else {
-				return new RunningTotalPresentation("No such item found", 0, totalSoFar);
+			return new RunningTotalPresentation("No such item found", 0, totalSoFar);
 		}
     }
 	/**
@@ -86,6 +89,11 @@ public class RunningTotal {
     public void setNewTotalSoFar(double totalSoFar) {
 		this.totalSoFar = totalSoFar;    
     }
+
+    public void newSale() {
+	    this.listOfCurrentItems = new ListOfCurrentItems();
+		this.totalSoFar = 0;
+    }
     
     private void updateTotalSoFar(double price, int amount) {
 	    for (int i = 0; i < amount; i++) {
@@ -102,12 +110,5 @@ public class RunningTotal {
 		listOfCurrentItems.addItem(item, amount);
     }
 
-    private Item[] createItemList() {
-	    Item kalaspuffar = new Item(77, 25, "Kalaspuffar");
-		Item choklad = new Item(95, 15, "Choklad");
-		Item juice = new Item(107, 10, "Juice");
-		Item[] itemList = {kalaspuffar, choklad, juice};
-		return itemList;
-    }
 }
 

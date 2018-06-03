@@ -10,6 +10,7 @@ import model.RunningTotal;
 import view.View;
 import integration.Item;
 import integration.Customer;
+import java.io.IOException;
 /**
  *
  * @author pethrus
@@ -23,7 +24,7 @@ public class Main {
      * completely to the View.
      * @param args the command line arguments, not used here.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException, IOException {
 		RunningTotal runningTotal = new RunningTotal();
 		Controller controller = new Controller(runningTotal);
 		Customer customer = new Customer(1);

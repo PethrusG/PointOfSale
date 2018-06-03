@@ -1,0 +1,7 @@
+Exception was thrown: The item with id: 78 could not be found in the inventory.
+integration.NoSuchItemException: The item with id: 78 could not be found in the inventory.
+	at integration.Inventory.getItem(Inventory.java:45)
+	at model.RunningTotal.registerItem(RunningTotal.java:53)
+	at controller.Controller.registerItem(Controller.java:51)
+	at view.View.sampleExecution(View.java:59)
+	at startup.Main.main(Main.java:30)

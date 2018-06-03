@@ -25,4 +25,8 @@ public class RunningTotalLog {
 		this.listOfItems = listOfItems;
 		this.total = total;
 	}
+
+	public double getTotal() {
+		return this.total;
+	}
 }
